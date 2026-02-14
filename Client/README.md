@@ -1,16 +1,87 @@
-# React + Vite
+# Web UI Interface for ID/Text Pairs
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, polished web interface for displaying and managing ID/Text pairs. Built with React, Vite, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Modern Design**: High-end UI with gradient backgrounds, glassmorphism effects, and smooth animations
+- **Responsive**: Works seamlessly on desktop, tablet, and mobile devices
+- **Performance**: Built with Vite for fast development and optimized production builds
+- **Tailwind CSS**: Utility-first styling for a consistent, professional look
+- **Interactive**: Hover effects, animations, and responsive buttons
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js 18+ and npm
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Installation
+
+```bash
+# Install dependencies
+npm install
+```
+
+### Development
+
+```bash
+# Start development server
+npm run dev
+```
+
+The application will be available at `http://localhost:5173/`
+
+### Build
+
+```bash
+# Create production build
+npm run build
+```
+
+The build output will be in the `dist/` directory.
+
+### Preview Production Build
+
+```bash
+# Preview production build locally
+npm run preview
+```
+
+## Project Structure
+
+```
+Client/
+├── public/          # Static assets
+├── src/
+│   ├── assets/      # Images and other assets
+│   ├── App.jsx      # Main application component
+│   ├── App.css      # Custom animations and styles
+│   ├── index.css    # Tailwind CSS directives
+│   └── main.jsx     # Application entry point
+├── index.html       # HTML template
+└── package.json     # Dependencies and scripts
+```
+
+## Technology Stack
+
+- **React 19.2**: Modern UI library
+- **Vite 7.3**: Next-generation frontend tooling
+- **Tailwind CSS v4**: Utility-first CSS framework
+- **ESLint**: Code linting and quality
+
+## Customization
+
+To modify the ID/Text pairs data, edit the `items` state in `src/App.jsx`:
+
+```javascript
+const [items] = useState([
+  { id: 1, text: 'Your text here' },
+  { id: 2, text: 'Another item' },
+  // Add more items...
+])
+```
+
+## License
+
+This project is part of the TestDB repository.
