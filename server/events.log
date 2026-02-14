@@ -42,3 +42,18 @@
 2026-02-14T22:50:26.3415388Z REQUEST_START GET / from 127.0.0.1 user=anonymous
 2026-02-14T22:50:26.3423906Z REQUEST_END GET / 404 2ms from 127.0.0.1 user=anonymous
 2026-02-14T23:08:34.0743471Z SERVER_START Server running on http://localhost:5001; env=Production
+2026-02-14T23:33:23.7953489Z SERVER_START Server running on http://localhost:3001; env=Production; devBypassAuth=True
+2026-02-14T23:33:30.9488378Z AUTH_BYPASS path=/api/health
+2026-02-14T23:33:30.9560158Z REQUEST_START GET /api/health from ::1 user=admin
+2026-02-14T23:33:31.0655335Z REQUEST_END GET /api/health 200 114ms from ::1 user=admin
+2026-02-14T23:34:50.5231474Z AUTH_BYPASS path=/api/auth/login
+2026-02-14T23:34:50.5233483Z REQUEST_START POST /api/auth/login from ::1 user=admin
+2026-02-14T23:34:50.7574620Z LOGIN_SUCCESS userId=1 username=admin
+2026-02-14T23:34:50.7636587Z REQUEST_END POST /api/auth/login 200 240ms from ::1 user=admin
+2026-02-14T23:34:59.1463178Z AUTH_BYPASS path=/api/auth/login
+2026-02-14T23:34:59.1464850Z REQUEST_START POST /api/auth/login from ::1 user=admin
+2026-02-14T23:34:59.1848010Z LOGIN_FAILED username=baduser
+2026-02-14T23:34:59.1857006Z REQUEST_END POST /api/auth/login 401 39ms from ::1 user=admin
+2026-02-14T23:35:06.4134794Z AUTH_BYPASS path=/api/requirements
+2026-02-14T23:35:06.4167233Z REQUEST_START GET /api/requirements from ::1 user=admin
+2026-02-14T23:35:06.4690014Z REQUEST_END GET /api/requirements 200 52ms from ::1 user=admin
