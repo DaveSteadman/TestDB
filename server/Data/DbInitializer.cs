@@ -20,11 +20,12 @@ public static class DbInitializer
             logger.LogInformation("Database initialized successfully");
 
             // Check if admin user already exists
-            var adminExists = context.Users.Any(u => u.Username == "admin");
-            if (!adminExists)
+            var adminPassword = BCrypt.Net.BCrypt.HashPassword("admin");
+            var adminUser = context.Users.FirstOrDefault(u => u.Username == "admin");
+
+            if (adminUser == null)
             {
-                var adminPassword = BCrypt.Net.BCrypt.HashPassword("admin123");
-                var adminUser = new User
+                adminUser = new User
                 {
                     Username = "admin",
                     Password = adminPassword,
@@ -34,11 +35,17 @@ public static class DbInitializer
 
                 context.Users.Add(adminUser);
                 context.SaveChanges();
-                logger.LogInformation("Admin user created (username: admin, password: admin123)");
+                logger.LogInformation("Admin user created (username: admin, password: admin)");
             }
             else
             {
-                logger.LogInformation("Admin user already exists");
+                adminUser.Password = adminPassword;
+                if (string.IsNullOrWhiteSpace(adminUser.Email))
+                {
+                    adminUser.Email = "admin@testdb.com";
+                }
+                context.SaveChanges();
+                logger.LogInformation("Admin user updated (username: admin, password: admin)");
             }
 
             logger.LogInformation("Tables: users, requirements, test_cases, requirement_test_mapping");

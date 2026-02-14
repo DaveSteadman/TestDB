@@ -61,21 +61,21 @@ Command-line parameters override settings in `appsettings.json`:
 
 ```bash
 # Set port
-dotnet run --port 3002
-dotnet run -p 3002
+dotnet run -- --port 3002
+dotnet run -- -p 3002
 
 # Set environment
-dotnet run --environment Production
-dotnet run -e Production
+dotnet run -- --environment Production
+dotnet run -- -e Production
 
 # Set JWT secret
-dotnet run --jwt-secret "your-custom-secret-key"
+dotnet run -- --jwt-secret "your-custom-secret-key"
 
 # Set CORS origin
-dotnet run --cors-origin "http://localhost:5000"
+dotnet run -- --cors-origin "http://localhost:5000"
 
 # Combine multiple parameters
-dotnet run --port 3002 --environment Production --jwt-secret "secure-key" --cors-origin "https://example.com"
+dotnet run -- --port 3002 --environment Production --jwt-secret "secure-key" --cors-origin "https://example.com"
 ```
 
 ### Using Environment Variables
@@ -84,11 +84,23 @@ You can also use environment variables:
 
 ```bash
 # Windows (PowerShell)
-$env:JWT_SECRET = "your-secret-key"
+$env:Jwt__Secret = "your-secret-key"
 dotnet run
 
 # Linux/macOS
-export JWT_SECRET="your-secret-key"
+export Jwt__Secret="your-secret-key"
+dotnet run
+```
+
+You can also set the listening URL explicitly:
+
+```bash
+# Windows (PowerShell)
+$env:ASPNETCORE_URLS = "http://localhost:3002"
+dotnet run
+
+# Linux/macOS
+export ASPNETCORE_URLS="http://localhost:3002"
 dotnet run
 ```
 

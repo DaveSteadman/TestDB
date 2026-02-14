@@ -1,4 +1,5 @@
 using System.Text;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,21 +12,28 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddCommandLine(args);
 
 // Get configuration values (command-line overrides appsettings)
-var jwtSecret = builder.Configuration["jwt-secret"] 
-    ?? builder.Configuration["Jwt:Secret"] 
+var jwtSecret = builder.Configuration["jwt-secret"]
+    ?? builder.Configuration["Jwt:Secret"]
     ?? "your-secret-key-change-in-production";
 
-var corsOrigin = builder.Configuration["cors-origin"] 
-    ?? builder.Configuration["Cors:AllowedOrigin"] 
-    ?? "http://localhost:3000";
+var corsOrigin = builder.Configuration["cors-origin"]
+    ?? builder.Configuration["Cors:AllowedOrigin"]
+    ?? "http://localhost:3000,http://localhost:3003";
 
-var port = builder.Configuration["port"] 
-    ?? builder.Configuration["p"] 
-    ?? builder.Configuration["Server:Port"] 
+var corsOrigins = corsOrigin
+    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+    .Select(origin => origin.Trim())
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .ToArray();
+
+var port = builder.Configuration["port"]
+    ?? builder.Configuration["p"]
+    ?? builder.Configuration["Server:Port"]
+    ?? builder.Configuration["PORT"]
     ?? "3001";
 
-var environment = builder.Configuration["environment"] 
-    ?? builder.Configuration["e"] 
+var environment = builder.Configuration["environment"]
+    ?? builder.Configuration["e"]
     ?? builder.Environment.EnvironmentName;
 
 // Update environment if specified
@@ -35,14 +43,21 @@ if (builder.Configuration["environment"] != null || builder.Configuration["e"] !
 }
 
 // Warning for production
-if (jwtSecret == "your-secret-key-change-in-production" && 
+if (jwtSecret == "your-secret-key-change-in-production" &&
     builder.Environment.IsProduction())
 {
     Console.WriteLine("WARNING: Using default JWT secret in production is insecure! Set JWT_SECRET environment variable or use --jwt-secret parameter.");
 }
 
-// Configure port
-builder.WebHost.UseUrls($"http://localhost:{port}");
+// Configure URLs (do not override if URLs are explicitly configured)
+var urls = builder.Configuration["urls"]
+    ?? builder.Configuration["ASPNETCORE_URLS"];
+
+var listenUrls = string.IsNullOrWhiteSpace(urls)
+    ? $"http://localhost:{port}"
+    : urls;
+
+builder.WebHost.UseUrls(listenUrls);
 
 // Add services to the container
 builder.Services.AddControllers()
@@ -77,7 +92,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(corsOrigin)
+        policy.WithOrigins(corsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -86,6 +101,7 @@ builder.Services.AddCors(options =>
 
 // Add services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<EventsLogger>();
 
 // Build app
 var app = builder.Build();
@@ -111,13 +127,30 @@ using (var scope = app.Services.CreateScope())
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    var eventsLogger = context.RequestServices.GetRequiredService<EventsLogger>();
+    var stopwatch = Stopwatch.StartNew();
+    var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+    var username = context.User?.FindFirst("username")?.Value ?? "anonymous";
+
+    eventsLogger.Log("REQUEST_START", $"{context.Request.Method} {context.Request.Path} from {ip} user={username}");
+    await next();
+    stopwatch.Stop();
+    eventsLogger.Log("REQUEST_END", $"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode} {stopwatch.ElapsedMilliseconds}ms from {ip} user={username}");
+});
 app.MapControllers();
 
 // Log startup information
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation($"Server running on port {port}");
-logger.LogInformation($"API available at http://localhost:{port}/api");
+var primaryUrl = listenUrls.Split(';', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim()
+    ?? $"http://localhost:{port}";
+logger.LogInformation($"Server running on {listenUrls}");
+logger.LogInformation($"API available at {primaryUrl}/api");
 logger.LogInformation($"Environment: {builder.Environment.EnvironmentName}");
-logger.LogInformation($"CORS origin: {corsOrigin}");
+logger.LogInformation($"CORS origin(s): {string.Join(", ", corsOrigins)}");
+
+var eventsLogger = app.Services.GetRequiredService<EventsLogger>();
+eventsLogger.Log("SERVER_START", $"Server running on {listenUrls}; env={builder.Environment.EnvironmentName}");
 
 app.Run();

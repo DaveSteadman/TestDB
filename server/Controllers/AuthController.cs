@@ -16,12 +16,14 @@ public class AuthController : ControllerBase
 {
     private readonly TestDbContext _context;
     private readonly IAuthService _authService;
+    private readonly EventsLogger _eventsLogger;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(TestDbContext context, IAuthService authService, ILogger<AuthController> logger)
+    public AuthController(TestDbContext context, IAuthService authService, EventsLogger eventsLogger, ILogger<AuthController> logger)
     {
         _context = context;
         _authService = authService;
+        _eventsLogger = eventsLogger;
         _logger = logger;
     }
 
@@ -38,16 +40,19 @@ public class AuthController : ControllerBase
 
             if (user == null)
             {
+                _eventsLogger.Log("LOGIN_FAILED", $"username={loginDto.Username}");
                 return Unauthorized(new { error = "Invalid credentials" });
             }
 
             var passwordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password);
             if (!passwordValid)
             {
+                _eventsLogger.Log("LOGIN_FAILED", $"username={loginDto.Username}");
                 return Unauthorized(new { error = "Invalid credentials" });
             }
 
             var token = _authService.GenerateToken(user);
+            _eventsLogger.Log("LOGIN_SUCCESS", $"userId={user.Id} username={user.Username}");
 
             return Ok(new
             {
@@ -94,6 +99,8 @@ public class AuthController : ControllerBase
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            _eventsLogger.Log("REGISTER", $"userId={user.Id} username={user.Username}");
 
             return StatusCode(201, new { message = "User registered successfully", userId = user.Id });
         }

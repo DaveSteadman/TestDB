@@ -40,38 +40,54 @@ npm start
 - The app runs at: http://localhost:3000
 - The browser should open automatically.
 
+If PowerShell blocks `npm` with a script policy error or says `npm` is not recognized,
+use the Windows command shim instead:
+
+```bash
+& "C:\Program Files\nodejs\npm.cmd" start
+```
+
+If you see `'"node"' is not recognized`, prepend Node to PATH in the same session:
+
+```bash
+$env:Path = "C:\Program Files\nodejs;$env:Path"
+& "C:\Program Files\nodejs\npm.cmd" start
+```
+
 ## API configuration
 
 By default, the client calls `http://localhost:3001/api`.
-If your API is hosted elsewhere, create a `.env` file in `client/` with:
+If your API is hosted elsewhere (for example the C# server on port 3002), create a `.env` file in `client/` with:
 
 ```
-REACT_APP_API_URL=http://localhost:3001/api
+REACT_APP_API_URL=http://localhost:3002/api
 ```
 
 Restart `npm start` after changing `.env`.
 
-## Optional: Run the server locally
+## Optional: Run the server locally (C#)
 
 If you need data, start the server in a second terminal:
 
 ```bash
 cd server
-npm install
-npm run init-db
-npm start
+dotnet run -- --port 3002
 ```
 
-Server runs at: http://localhost:3001
+Server runs at: http://localhost:3002
 
-Default login (if you ran `init-db`):
+Default login (dev):
 - Username: admin
-- Password: admin123
+- Password: admin
 
 ## Troubleshooting
 
 - `npm` not recognized:
   - Install Node.js LTS, reopen terminal, re-run the commands.
+- PowerShell script policy blocks `npm`:
+  - Use `& "C:\Program Files\nodejs\npm.cmd" start` instead.
+- `"node"` not recognized when running `npm.cmd`:
+  - Run `$env:Path = "C:\Program Files\nodejs;$env:Path"` (note the leading `$`) and try again.
 - Port 3000 in use:
   - Stop the other process or choose a different port when prompted.
 - API errors:
