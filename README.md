@@ -126,7 +126,13 @@ TestDB/
 - Passwords are hashed using bcryptjs
 - JWT tokens for authentication
 - Protected API endpoints
-- CORS enabled for cross-origin requests
+- CORS configured (set CORS_ORIGIN env variable for production)
+
+**⚠️ Important Security Notes:**
+1. Change the default admin password (`admin123`) immediately after first login
+2. Set a strong `JWT_SECRET` environment variable in production
+3. Configure `CORS_ORIGIN` to restrict API access to your client domain
+4. Use HTTPS in production environments
 
 ## 📚 API Documentation
 

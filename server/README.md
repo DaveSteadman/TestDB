@@ -35,6 +35,8 @@ This creates the database with all tables and a default admin user:
 - Username: `admin`
 - Password: `admin123`
 
+**⚠️ SECURITY WARNING**: Change the default admin password immediately after first login!
+
 ## Running the Server
 
 ```bash
@@ -95,4 +97,6 @@ Authorization: Bearer <token>
 ## Environment Variables
 
 - `PORT` - Server port (default: 3001)
-- `JWT_SECRET` - Secret key for JWT tokens (change in production!)
+- `JWT_SECRET` - Secret key for JWT tokens (**Required in production!**)
+- `CORS_ORIGIN` - Allowed CORS origin (default: http://localhost:3000)
+- `NODE_ENV` - Environment mode (development/production)
