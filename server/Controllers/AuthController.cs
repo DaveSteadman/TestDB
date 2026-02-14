@@ -67,6 +67,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
+            _eventsLogger.Log("LOGIN_ERROR", $"username={loginDto.Username} error={ex.Message}");
             _logger.LogError(ex, "Error during login");
             return StatusCode(500, new { error = "Database error" });
         }
@@ -84,6 +85,7 @@ public class AuthController : ControllerBase
                 string.IsNullOrWhiteSpace(registerDto.Password) ||
                 string.IsNullOrWhiteSpace(registerDto.Email))
             {
+                _eventsLogger.Log("REGISTER_FAILED", $"username={registerDto.Username ?? "null"} reason=missing_fields");
                 return BadRequest(new { error = "All fields are required" });
             }
 
@@ -108,13 +110,16 @@ public class AuthController : ControllerBase
         {
             if (ex.InnerException?.Message.Contains("UNIQUE") == true)
             {
+                _eventsLogger.Log("REGISTER_FAILED", $"username={registerDto.Username} reason=duplicate");
                 return BadRequest(new { error = "Username or email already exists" });
             }
+            _eventsLogger.Log("REGISTER_ERROR", $"username={registerDto.Username} error={ex.Message}");
             _logger.LogError(ex, "Error during registration");
             return StatusCode(500, new { error = "Database error" });
         }
         catch (Exception ex)
         {
+            _eventsLogger.Log("REGISTER_ERROR", $"username={registerDto.Username} error={ex.Message}");
             _logger.LogError(ex, "Error during registration");
             return StatusCode(500, new { error = "Database error" });
         }
