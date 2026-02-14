@@ -12,10 +12,10 @@ public class DatabaseService : IDisposable
     {
         _connection = new SqliteConnection(connectionString);
         _connection.Open();
-        InitializeDatabase();
+        InitializeDatabaseSync();
     }
 
-    private void InitializeDatabase()
+    private void InitializeDatabaseSync()
     {
         _semaphore.Wait();
         try
