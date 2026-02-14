@@ -133,6 +133,7 @@ TestDB/
 2. Set a strong `JWT_SECRET` environment variable in production
 3. Configure `CORS_ORIGIN` to restrict API access to your client domain
 4. Use HTTPS in production environments
+5. Consider adding rate limiting for production deployments to prevent abuse
 
 ## 📚 API Documentation
 
