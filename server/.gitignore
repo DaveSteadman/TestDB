@@ -9,5 +9,8 @@ obj/
 *.user
 *.suo
 
+# Logs
+events.log
+
 # macOS
 .DS_Store
