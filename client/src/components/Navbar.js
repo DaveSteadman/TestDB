@@ -1,10 +1,15 @@
 import React from 'react';
 import { authService } from '../services/api';
+import clientLogger from '../services/clientLogger';
 
 function Navbar({ user, currentPage, onNavigate }) {
   const handleLogout = () => {
     authService.logout();
     window.location.reload();
+  };
+
+  const handleDownloadLogs = () => {
+    clientLogger.downloadLogs();
   };
 
   return (
@@ -51,6 +56,13 @@ function Navbar({ user, currentPage, onNavigate }) {
         >
           Mappings
         </a>
+        <button 
+          className="btn-logs" 
+          onClick={handleDownloadLogs}
+          title="Download client event logs for debugging"
+        >
+          📋 Logs
+        </button>
         <span className="navbar-user">👤 {user?.username}</span>
         <button className="btn-logout" onClick={handleLogout}>
           Logout

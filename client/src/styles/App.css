@@ -188,6 +188,23 @@ code {
   background: #ff3838;
 }
 
+.btn-logs {
+  padding: 8px 16px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.btn-logs:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
 /* Dashboard */
 .dashboard {
   background: white;
