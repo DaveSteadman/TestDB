@@ -1,4 +1,13 @@
-node_modules/
+# C# / .NET
+bin/
+obj/
 *.db
-.env
+*.db-shm
+*.db-wal
+.vs/
+.vscode/
+*.user
+*.suo
+
+# macOS
 .DS_Store
