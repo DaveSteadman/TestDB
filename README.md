@@ -7,11 +7,12 @@ A comprehensive multi-user database system for managing software requirements an
 This project is split into two main components:
 
 ### Server (`/server`)
-- Node.js/Express backend
-- SQLite database
+- C# ASP.NET Core 8.0 Web API console application
+- SQLite database with Entity Framework Core
 - JWT authentication
 - RESTful API for requirements, test cases, and mappings
 - Multi-user support
+- Command-line parameter configuration
 
 ### Client (`/client`)
 - React-based web interface
@@ -32,17 +33,19 @@ The system includes four main tables:
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- .NET 8.0 SDK or later
+- Node.js (v14 or higher) for the client
 - npm or yarn
 
 ### Setup Server
 
 ```bash
 cd server
-npm install
-npm run init-db  # Initialize database with tables and default admin user
-npm start        # Start server on port 3001
+dotnet build       # Build the application
+dotnet run         # Start server on port 3001
 ```
+
+The database will be automatically created and initialized on first run with a default admin user.
 
 Default admin credentials:
 - Username: `admin`
@@ -69,8 +72,15 @@ The client will open automatically in your browser at `http://localhost:3000`.
 ## 🔧 Configuration
 
 ### Server Configuration
-- Port: Set via `PORT` environment variable (default: 3001)
-- JWT Secret: Set via `JWT_SECRET` environment variable (change in production!)
+- Port: Set via `--port` command-line parameter or `Server:Port` in appsettings.json (default: 3001)
+- JWT Secret: Set via `--jwt-secret` parameter or `Jwt:Secret` in appsettings.json (change in production!)
+- CORS Origin: Set via `--cors-origin` parameter or `Cors:AllowedOrigin` in appsettings.json
+- Environment: Set via `--environment` parameter or ASPNETCORE_ENVIRONMENT variable
+
+Example with command-line parameters:
+```bash
+dotnet run --port 3002 --jwt-secret "your-secret" --cors-origin "https://example.com"
+```
 
 ### Client Configuration
 - API URL: Set via `REACT_APP_API_URL` in `.env` file (default: http://localhost:3001/api)
@@ -79,10 +89,14 @@ The client will open automatically in your browser at `http://localhost:3000`.
 
 ```
 TestDB/
-├── server/              # Backend server
-│   ├── server.js        # Main server file
-│   ├── init-db.js       # Database initialization
-│   ├── package.json     # Server dependencies
+├── server/              # Backend server (C# ASP.NET Core)
+│   ├── Controllers/     # API controllers
+│   ├── Models/          # Data models
+│   ├── Data/            # EF Core DbContext
+│   ├── Services/        # Business logic services
+│   ├── DTOs/            # Data transfer objects
+│   ├── Program.cs       # Application entry point
+│   ├── appsettings.json # Configuration
 │   └── README.md        # Server documentation
 ├── client/              # Frontend client
 │   ├── public/          # Static files
@@ -123,15 +137,15 @@ TestDB/
 
 ## 🔒 Security
 
-- Passwords are hashed using bcryptjs
+- Passwords are hashed using BCrypt.Net
 - JWT tokens for authentication
 - Protected API endpoints
-- CORS configured (set CORS_ORIGIN env variable for production)
+- CORS configured (set via --cors-origin parameter or appsettings.json)
 
 **⚠️ Important Security Notes:**
 1. Change the default admin password (`admin123`) immediately after first login
-2. Set a strong `JWT_SECRET` environment variable in production
-3. Configure `CORS_ORIGIN` to restrict API access to your client domain
+2. Set a strong JWT secret via `--jwt-secret` parameter or appsettings.json in production
+3. Configure CORS origin to restrict API access to your client domain
 4. Use HTTPS in production environments
 5. Consider adding rate limiting for production deployments to prevent abuse
 
@@ -144,7 +158,7 @@ See `/server/README.md` for detailed API endpoint documentation.
 ### Server Development
 ```bash
 cd server
-npm run dev  # Run with nodemon for auto-reload
+dotnet watch run  # Run with hot reload
 ```
 
 ### Client Development

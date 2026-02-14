@@ -1,6 +1,6 @@
-# TestDB Server
+# TestDB Server - C# Console Application
 
-Multi-user database server for managing software requirements and test cases.
+Multi-user database server for managing software requirements and test cases, built with ASP.NET Core Web API.
 
 ## Features
 
@@ -8,7 +8,12 @@ Multi-user database server for managing software requirements and test cases.
 - RESTful API for requirements management
 - RESTful API for test cases management
 - Requirement-to-test case mapping
-- SQLite database backend
+- SQLite database backend with Entity Framework Core
+- Command-line parameter support for flexible configuration
+
+## Requirements
+
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or later
 
 ## Database Schema
 
@@ -21,33 +26,71 @@ Multi-user database server for managing software requirements and test cases.
 
 ## Installation
 
-```bash
-npm install
-```
-
-## Initialize Database
+### Build the Application
 
 ```bash
-npm run init-db
+cd server
+dotnet build
 ```
 
-This creates the database with all tables and a default admin user:
+### Run the Application
+
+```bash
+dotnet run
+```
+
+The database will be automatically created and initialized on first run with a default admin user:
 - Username: `admin`
 - Password: `admin123`
 
 **⚠️ SECURITY WARNING**: Change the default admin password immediately after first login!
 
-## Running the Server
+## Configuration
+
+### Using appsettings.json
+
+Edit `appsettings.json` to configure:
+- Server port (default: 3001)
+- JWT secret key
+- CORS allowed origin
+- Database connection string
+
+### Using Command-Line Parameters
+
+Command-line parameters override settings in `appsettings.json`:
 
 ```bash
-# Production
-npm start
+# Set port
+dotnet run --port 3002
+dotnet run -p 3002
 
-# Development (with auto-reload)
-npm run dev
+# Set environment
+dotnet run --environment Production
+dotnet run -e Production
+
+# Set JWT secret
+dotnet run --jwt-secret "your-custom-secret-key"
+
+# Set CORS origin
+dotnet run --cors-origin "http://localhost:5000"
+
+# Combine multiple parameters
+dotnet run --port 3002 --environment Production --jwt-secret "secure-key" --cors-origin "https://example.com"
 ```
 
-The server runs on port 3001 by default.
+### Using Environment Variables
+
+You can also use environment variables:
+
+```bash
+# Windows (PowerShell)
+$env:JWT_SECRET = "your-secret-key"
+dotnet run
+
+# Linux/macOS
+export JWT_SECRET="your-secret-key"
+dotnet run
+```
 
 ## API Endpoints
 
@@ -56,29 +99,30 @@ The server runs on port 3001 by default.
 - `POST /api/auth/login` - Login with username and password
 - `POST /api/auth/register` - Register a new user
 
-### Requirements
+### Requirements (Authentication Required)
 
 - `GET /api/requirements` - Get all requirements
-- `GET /api/requirements/:id` - Get a specific requirement
+- `GET /api/requirements/{id}` - Get a specific requirement
 - `POST /api/requirements` - Create a new requirement
-- `PUT /api/requirements/:id` - Update a requirement
-- `DELETE /api/requirements/:id` - Delete a requirement
-- `GET /api/requirements/:id/test-cases` - Get all test cases linked to a requirement
+- `PUT /api/requirements/{id}` - Update a requirement
+- `DELETE /api/requirements/{id}` - Delete a requirement
+- `GET /api/requirements/{id}/test-cases` - Get all test cases linked to a requirement
 
-### Test Cases
+### Test Cases (Authentication Required)
 
 - `GET /api/test-cases` - Get all test cases
-- `GET /api/test-cases/:id` - Get a specific test case
+- `GET /api/test-cases/{id}` - Get a specific test case
 - `POST /api/test-cases` - Create a new test case
-- `PUT /api/test-cases/:id` - Update a test case
-- `DELETE /api/test-cases/:id` - Delete a test case
-- `GET /api/test-cases/:id/requirements` - Get all requirements linked to a test case
+- `PUT /api/test-cases/{id}` - Update a test case
+- `DELETE /api/test-cases/{id}` - Delete a test case
+- `GET /api/test-cases/{id}/requirements` - Get all requirements linked to a test case
 
-### Mappings
+### Mappings (Authentication Required)
 
 - `GET /api/mappings` - Get all requirement-test mappings
 - `POST /api/mappings` - Create a new mapping
-- `DELETE /api/mappings/:id` - Delete a mapping
+  - Body: `{ "requirementId": 1, "testCaseId": 1 }`
+- `DELETE /api/mappings/{id}` - Delete a mapping
 
 ### Health Check
 
@@ -86,7 +130,7 @@ The server runs on port 3001 by default.
 
 ## Authentication
 
-All API endpoints (except `/api/auth/login` and `/api/auth/register`) require authentication.
+All API endpoints (except `/api/auth/login`, `/api/auth/register`, and `/api/health`) require authentication.
 
 Include the JWT token in the Authorization header:
 
@@ -94,9 +138,91 @@ Include the JWT token in the Authorization header:
 Authorization: Bearer <token>
 ```
 
-## Environment Variables
+## Example Request
 
-- `PORT` - Server port (default: 3001)
-- `JWT_SECRET` - Secret key for JWT tokens (**Required in production!**)
-- `CORS_ORIGIN` - Allowed CORS origin (default: http://localhost:3000)
-- `NODE_ENV` - Environment mode (development/production)
+```bash
+# Login
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Create a requirement (with token)
+curl -X POST http://localhost:3001/api/requirements \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{"title":"User Login","description":"User should be able to login","priority":"High","status":"Active"}'
+```
+
+## Development
+
+### Run in Development Mode
+
+```bash
+dotnet run --environment Development
+```
+
+### Watch for Changes
+
+```bash
+dotnet watch run
+```
+
+### Restore Dependencies
+
+```bash
+dotnet restore
+```
+
+## Production Deployment
+
+For production deployment:
+
+1. Set a strong JWT secret using environment variable or command-line parameter
+2. Configure CORS to match your frontend domain
+3. Consider using a more robust database (the code can be adapted for PostgreSQL, SQL Server, etc.)
+4. Build in Release mode:
+
+```bash
+dotnet build -c Release
+dotnet run -c Release --jwt-secret "strong-random-secret-key" --cors-origin "https://yourdomain.com"
+```
+
+## Technology Stack
+
+- **Framework**: ASP.NET Core 8.0
+- **Database**: SQLite with Entity Framework Core
+- **Authentication**: JWT Bearer tokens
+- **Password Hashing**: BCrypt
+- **Architecture**: MVC with Controllers, Services, and Data Access Layer
+
+## Project Structure
+
+```
+server/
+├── Program.cs                          # Application entry point
+├── TestDB.Server.csproj                # Project file
+├── appsettings.json                    # Configuration
+├── appsettings.Development.json        # Development configuration
+├── Data/
+│   ├── TestDbContext.cs               # EF Core DbContext
+│   └── DbInitializer.cs               # Database initialization
+├── Models/
+│   ├── User.cs                        # User entity
+│   ├── Requirement.cs                 # Requirement entity
+│   ├── TestCase.cs                    # TestCase entity
+│   └── RequirementTestMapping.cs      # Mapping entity
+├── DTOs/
+│   ├── LoginDto.cs                    # Login DTO
+│   ├── RegisterDto.cs                 # Register DTO
+│   ├── RequirementDto.cs              # Requirement DTOs
+│   └── TestCaseDto.cs                 # TestCase DTOs
+├── Services/
+│   ├── IAuthService.cs                # Auth service interface
+│   └── AuthService.cs                 # Auth service implementation
+└── Controllers/
+    ├── AuthController.cs              # Authentication endpoints
+    ├── RequirementsController.cs      # Requirements CRUD
+    ├── TestCasesController.cs         # Test cases CRUD
+    ├── MappingsController.cs          # Mapping management
+    └── HealthController.cs            # Health check
+```
