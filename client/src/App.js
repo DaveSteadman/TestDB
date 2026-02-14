@@ -12,13 +12,19 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const skipAuth = process.env.REACT_APP_SKIP_AUTH === 'true';
 
   useEffect(() => {
+    if (skipAuth) {
+      setIsAuthenticated(true);
+      setUser({ username: 'demo' });
+      return;
+    }
     if (authService.isAuthenticated()) {
       setIsAuthenticated(true);
       setUser(authService.getCurrentUser());
     }
-  }, []);
+  }, [skipAuth]);
 
   const handleLogin = () => {
     setIsAuthenticated(true);

@@ -4,13 +4,23 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg-start: #eef2f7;
+  --bg-end: #dbe4f0;
+  --primary: #1f4fb2;
+  --primary-strong: #173f8f;
+  --accent: #1f7a8c;
+  --accent-strong: #165e6b;
+  --shadow-primary: rgba(31, 79, 178, 0.35);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
   min-height: 100vh;
 }
 
@@ -72,7 +82,7 @@ code {
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary);
 }
 
 .btn {
@@ -87,13 +97,13 @@ code {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   color: white;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 20px var(--shadow-primary);
 }
 
 .btn-secondary {
@@ -129,7 +139,7 @@ code {
 .navbar-brand {
   font-size: 24px;
   font-weight: bold;
-  color: #667eea;
+  color: var(--primary);
 }
 
 .navbar-menu {
@@ -149,11 +159,11 @@ code {
 
 .navbar-link:hover {
   background: #f0f0f0;
-  color: #667eea;
+  color: var(--primary);
 }
 
 .navbar-link.active {
-  background: #667eea;
+  background: var(--primary);
   color: white;
 }
 
@@ -200,7 +210,7 @@ code {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   color: white;
   padding: 25px;
   border-radius: 10px;
@@ -232,7 +242,7 @@ code {
 
 .btn-add {
   padding: 12px 24px;
-  background: #667eea;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -243,7 +253,7 @@ code {
 
 .btn-add:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 5px 15px var(--shadow-primary);
 }
 
 .items-list {
@@ -261,7 +271,7 @@ code {
 }
 
 .item-card:hover {
-  border-color: #667eea;
+  border-color: var(--primary);
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
@@ -321,12 +331,12 @@ code {
 }
 
 .btn-edit {
-  background: #667eea;
+  background: var(--primary);
   color: white;
 }
 
 .btn-edit:hover {
-  background: #5568d3;
+  background: var(--primary-strong);
 }
 
 .btn-delete {
@@ -380,7 +390,7 @@ code {
 
 .modal textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary);
 }
 
 .modal select {
@@ -395,7 +405,7 @@ code {
 
 .modal select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary);
 }
 
 .modal-actions {
