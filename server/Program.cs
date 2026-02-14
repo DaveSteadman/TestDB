@@ -1,5 +1,6 @@
 using System.Text;
 using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -35,6 +36,10 @@ var port = builder.Configuration["port"]
 var environment = builder.Configuration["environment"]
     ?? builder.Configuration["e"]
     ?? builder.Environment.EnvironmentName;
+
+var devBypassAuth = builder.Configuration.GetValue<bool?>("dev-bypass-auth")
+    ?? builder.Configuration.GetValue<bool?>("DEV_BYPASS_AUTH")
+    ?? false;
 
 // Update environment if specified
 if (builder.Configuration["environment"] != null || builder.Configuration["e"] != null)
@@ -126,6 +131,27 @@ using (var scope = app.Services.CreateScope())
 // Configure middleware pipeline
 app.UseCors();
 app.UseAuthentication();
+if (devBypassAuth)
+{
+    app.Use(async (context, next) =>
+    {
+        if (context.User?.Identity?.IsAuthenticated != true)
+        {
+            var claims = new[]
+            {
+                new Claim("id", "1"),
+                new Claim("username", "admin"),
+                new Claim("email", "admin@testdb.com")
+            };
+            context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "DevBypass"));
+
+            var eventsLogger = context.RequestServices.GetRequiredService<EventsLogger>();
+            eventsLogger.Log("AUTH_BYPASS", $"path={context.Request.Path}");
+        }
+
+        await next();
+    });
+}
 app.UseAuthorization();
 app.Use(async (context, next) =>
 {
@@ -149,8 +175,9 @@ logger.LogInformation($"Server running on {listenUrls}");
 logger.LogInformation($"API available at {primaryUrl}/api");
 logger.LogInformation($"Environment: {builder.Environment.EnvironmentName}");
 logger.LogInformation($"CORS origin(s): {string.Join(", ", corsOrigins)}");
+logger.LogInformation($"Dev auth bypass: {devBypassAuth}");
 
 var eventsLogger = app.Services.GetRequiredService<EventsLogger>();
-eventsLogger.Log("SERVER_START", $"Server running on {listenUrls}; env={builder.Environment.EnvironmentName}");
+eventsLogger.Log("SERVER_START", $"Server running on {listenUrls}; env={builder.Environment.EnvironmentName}; devBypassAuth={devBypassAuth}");
 
 app.Run();

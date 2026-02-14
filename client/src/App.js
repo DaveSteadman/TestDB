@@ -12,7 +12,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const skipAuth = process.env.REACT_APP_SKIP_AUTH === 'true';
+  const skipAuth = process.env.REACT_APP_SKIP_AUTH !== 'false';
 
   useEffect(() => {
     if (skipAuth) {

@@ -92,6 +92,22 @@ export Jwt__Secret="your-secret-key"
 dotnet run
 ```
 
+### Development Auth Bypass (Optional)
+
+To work on the UI without logging in, you can bypass auth on the server:
+
+```bash
+# Windows (PowerShell)
+$env:DEV_BYPASS_AUTH = "true"
+dotnet run -- --port 5001
+
+# Linux/macOS
+export DEV_BYPASS_AUTH=true
+dotnet run -- --port 5001
+```
+
+This sets a temporary dev identity (username: admin) for every request that is not authenticated.
+
 You can also set the listening URL explicitly:
 
 ```bash

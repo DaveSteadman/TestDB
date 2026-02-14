@@ -41,3 +41,4 @@
 2026-02-14T22:50:20.8582890Z SERVER_START Server running on http://localhost:3002; env=Production
 2026-02-14T22:50:26.3415388Z REQUEST_START GET / from 127.0.0.1 user=anonymous
 2026-02-14T22:50:26.3423906Z REQUEST_END GET / 404 2ms from 127.0.0.1 user=anonymous
+2026-02-14T23:08:34.0743471Z SERVER_START Server running on http://localhost:5001; env=Production
