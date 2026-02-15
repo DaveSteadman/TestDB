@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     clientLogger.log('APP_INIT', 'Application starting', {
       skipAuth,
-      apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3001/api',
+      apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:5001/api',
     });
 
     // Check server connection
@@ -52,7 +52,7 @@ function App() {
     } catch (error) {
       setConnectionStatus('disconnected');
       clientLogger.logConnectionFailure(api.defaults.baseURL, error);
-      
+
       // Provide helpful error messages
       if (error.code === 'ECONNABORTED') {
         clientLogger.log('CONNECTION_ERROR', 'Server connection timeout - is the server running?');
@@ -104,7 +104,7 @@ function App() {
           <>
             ⚠️ Cannot connect to server. Please ensure the server is running at {api.defaults.baseURL}
             {' '}
-            <button 
+            <button
               onClick={checkServerConnection}
               style={{
                 marginLeft: '10px',

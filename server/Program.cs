@@ -130,6 +130,18 @@ using (var scope = app.Services.CreateScope())
 
 // Configure middleware pipeline
 app.UseCors();
+app.Use(async (context, next) =>
+{
+    var eventsLogger = context.RequestServices.GetRequiredService<EventsLogger>();
+    var stopwatch = Stopwatch.StartNew();
+    var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+    eventsLogger.Log("REQUEST_START", $"{context.Request.Method} {context.Request.Path} from {ip} user=anonymous");
+    await next();
+    stopwatch.Stop();
+    var username = context.User?.FindFirst("username")?.Value ?? "anonymous";
+    eventsLogger.Log("REQUEST_END", $"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode} {stopwatch.ElapsedMilliseconds}ms from {ip} user={username}");
+});
 app.UseAuthentication();
 if (devBypassAuth)
 {
@@ -153,18 +165,6 @@ if (devBypassAuth)
     });
 }
 app.UseAuthorization();
-app.Use(async (context, next) =>
-{
-    var eventsLogger = context.RequestServices.GetRequiredService<EventsLogger>();
-    var stopwatch = Stopwatch.StartNew();
-    var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-    var username = context.User?.FindFirst("username")?.Value ?? "anonymous";
-
-    eventsLogger.Log("REQUEST_START", $"{context.Request.Method} {context.Request.Path} from {ip} user={username}");
-    await next();
-    stopwatch.Stop();
-    eventsLogger.Log("REQUEST_END", $"{context.Request.Method} {context.Request.Path} {context.Response.StatusCode} {stopwatch.ElapsedMilliseconds}ms from {ip} user={username}");
-});
 app.MapControllers();
 
 // Log startup information

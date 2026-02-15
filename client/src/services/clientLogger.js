@@ -145,7 +145,7 @@ const clientLogger = new ClientLogger();
 
 // Log initial startup
 clientLogger.log('CLIENT_START', 'TestDB client initialized', {
-  apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:3001/api',
+  apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:5001/api',
   timestamp: new Date().toISOString(),
 });
 
